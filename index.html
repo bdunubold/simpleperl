@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+	</head>
+	<body>
+
+
+
+		<div class="container">
+
+			<div class="row">
+				<div class="col-sm-6">
+					<form id="addform" class="hidden" action="" method="post">
+						<div class="form-group">
+							<label for="appdate">Date</label>
+							<input required type="date" class="form-control" id="appdate" min="2017-11-22" max="2050-12-31" placeholder="1999-09-11">
+						</div>
+						<div class="form-group">
+							<label for="apptime">Time</label>
+							<input required type="time" class="form-control" id="apptime">
+						</div>
+						<div class="form-group">
+							<label for="desc">Description</label>
+							<input required type="text" class="form-control" id="desc">
+						</div>
+
+						<button id="formBtn" class="btn btn-primary" type="submit" name="button">add</button>
+						<button id="cancelBtn" class="btn btn-primary" type="button" name="button">cancel</button>
+
+					</form>
+
+					<button id="newBtn" class="btn btn-primary" type="button" name="button">New</button>
+				</div>
+
+
+			</div>
+
+			<div class="row">
+				<form id="searchForm" class="" action="" method="post">
+					<div class="form-group">
+							  <div class="col-sm-6">
+								  <input type="text" class="form-control" placeholder="" id="search">
+							  </div>
+							  <div class="col-sm-2">
+								<button type="submit" class="btn btn-primary">Search</button>
+							  </div>
+					</div>
+				</form>
+
+			</div>
+  		</div>
+
+
+	</body>
+
+
+	<footer>
+
+
+
+
+
+		 <script type="text/javascript">
+
+		 $(document).ready(function(){
+		 	getAppointments("");
+		 });
+
+		 var id = 0;
+
+		 $(document).on('click', '#cancelBtn', function () {
+			 $("#newBtn").removeClass("hidden");
+			 $("#addform").addClass("hidden");
+		 });
+
+		 $(document).on('click', '#newBtn', function () {
+			 $("#addform").removeClass("hidden");
+			 $(this).addClass("hidden");
+		 });
+
+
+		 function getAppointments(search)
+		 {
+			 $.ajax({
+			   type: "GET",
+			   url: "http://localhost:8080/cgi-bin/backend/getdata.cgi",
+			   data: {
+				  "search": search
+			   },
+			   dataType: "json",
+
+			   success: function(data) {
+				   var datas = $("#datas");
+
+				   datas.append("<table id='tableid'  class='table table-bordered'> ");
+
+				   var table = $("#tableid");
+
+				   table.append("<thead><tr><th> Id </th> <th> Date </th> <th> Time </th><th> Description </tr></th></thead>");
+
+
+				   $.each(data, function (index, value) {
+
+					   table.append("<tr><td>" + value.ID + "</td>" + "<td>" + value.Date + "</td>" + "<td>" + value.Time + "</td>" + "<td>" + value.Description + "</td></tr>");
+
+				   });
+
+				   },
+				   error: function(request, status, error) {
+					  console.log(error);
+				   }
+				});
+
+		 }
+
+		 jQuery(document).ready(function($) {
+		         var form = $('#searchForm');
+		         form.submit(function(e){
+					 e.preventDefault();
+		 			 $('#result').empty();
+		 			 var search = $('#search').val();
+					 getAppointments(search);
+		         });
+		 });
+
+
+
+		 jQuery(document).ready(function($) {
+		         var form = $('#addform');
+		         form.submit(function(e){
+					 e.preventDefault();
+		 			 var search = $('#search').val();
+
+					var appdate = $('#appdate');
+					var apptime = $('#apptime');
+					var desc = $('#desc');
+
+
+		 			 $.ajax({
+		 			   type: "POST",
+		 			   url: "http://localhost:8080/cgi-bin/backend/insertdata.cgi",
+		 			   data: {
+						   "id": id,
+						   "appdate": appdate,
+						   "apptime": apptime,
+						   "desc": desc
+		 			   },
+		 			   dataType: "json",
+		 			   success: function(data) {
+		 				   var table = $("#tableid");
+						   table.append("<tr><td>" + data.ID + "</td>" + "<td>" + data.Date + "</td>" + "<td>" + data.Time + "</td>" + "<td>" + data.Description + "</td></tr>");
+		 				   },
+		 				   error: function(request, status, error) {
+		 					  console.log(error);
+		 				   }
+		 				});
+		         });
+		 });
+
+
+
+
+
+
+
+
+
+		 </script>
+
+
+
+	</footer>
+</html>
